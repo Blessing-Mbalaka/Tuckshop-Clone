@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container text-center">
+        <h1><i class="fas fa-store"></i> Welcome to TuckShop</h1>
+        <p class="lead">Your neighborhood spaza shop management solution</p>
+        <p>Manage inventory, process orders, and serve your customers efficiently</p>
+        {% if not user.is_authenticated %}
+            <div class="mt-4">
+                <a href="{% url 'register' %}" class="btn btn-light btn-lg me-3">
+                    <i class="fas fa-user-plus"></i> Get Started
+                </a>
+                <a href="{% url 'product_list' %}" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-shopping-bag"></i> Browse Products
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="container mb-5">
+    <h2 class="text-center mb-4">Featured Products</h2>
+    
+    {% if products %}
+        <div class="row">
+            {% for product in products %}
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="card product-card">
+                        {% if product.is_low_stock %}
+                            <span class="product-badge low-stock-badge">Low Stock</span>
+                        {% endif %}
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                        {% else %}
+                            <img src="https://via.placeholder.com/300x200?text={{ product.name }}" class="card-img-top" alt="{{ product.name }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text text-muted">{{ product.description|truncatewords:10 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="price-tag">R{{ product.price }}</span>
+                                {% if product.is_in_stock %}
+                                    <small class="text-success"><i class="fas fa-check-circle"></i> In Stock</small>
+                                {% else %}
+                                    <small class="text-danger"><i class="fas fa-times-circle"></i> Out of Stock</small>
+                                {% endif %}
+                            </div>
+                            <div class="mt-3">
+                                <a href="{% url 'product_detail' product.pk %}" class="btn btn-outline-primary btn-sm me-2">
+                                    <i class="fas fa-info-circle"></i> Details
+                                </a>
+                                {% if user.is_authenticated and product.is_in_stock %}
+                                    <a href="{% url 'add_to_cart' product.pk %}" class="btn btn-success btn-sm">
+                                        <i class="fas fa-cart-plus"></i> Add to Cart
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{% url 'product_list' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-th"></i> View All Products
+            </a>
+        </div>
+    {% else %}
+        <div class="text-center">
+            <p class="lead">No products available at the moment.</p>
+            {% if user.is_staff %}
+                <a href="{% url 'admin:index' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Products
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="fas fa-boxes fa-3x mb-3" style="color: var(--accent-color);"></i>
+                    <h5 class="card-title">Inventory Management</h5>
+                    <p class="card-text">Track stock levels, monitor low stock items, and manage your inventory efficiently.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="fas fa-shopping-cart fa-3x mb-3" style="color: var(--success-color);"></i>
+                    <h5 class="card-title">Order Processing</h5>
+                    <p class="card-text">Process customer orders seamlessly, track order status, and manage purchases.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="fas fa-users fa-3x mb-3" style="color: var(--secondary-color);"></i>
+                    <h5 class="card-title">Customer Management</h5>
+                    <p class="card-text">Manage customer accounts, view order history, and provide excellent service.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
